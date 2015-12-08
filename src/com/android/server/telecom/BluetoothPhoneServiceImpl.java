@@ -260,13 +260,11 @@ public final class BluetoothPhoneServiceImpl {
                 long token = Binder.clearCallingIdentity();
                 try {
                     Log.i(TAG, "queryPhoneState");
-                    if (isDsdaEnabled()) {
-                        if (mBluetoothDsda != null) {
-                            try {
-                                mBluetoothDsda.processQueryPhoneState();
-                            } catch (RemoteException e) {
-                                Log.i(TAG, "DSDA Service not found exception " + e);
-                            }
+                    if (isDsdaEnabled() && (mBluetoothDsda != null)) {
+                        try {
+                            mBluetoothDsda.processQueryPhoneState();
+                        } catch (RemoteException e) {
+                            Log.i(TAG, "DSDA Service not found exception " + e);
                         }
                     } else {
                         updateHeadsetWithCallState(true /* force */, null);
@@ -914,7 +912,7 @@ public final class BluetoothPhoneServiceImpl {
      * @ param call is specified call for which Headset is to be updated.
      */
     private void updateHeadsetWithCallState(boolean force, Call call) {
-        if (isDsdaEnabled() && (call != null)) {
+        if (isDsdaEnabled() && (call != null) && (mBluetoothDsda != null)) {
             Log.d(TAG, "DSDA call operation, handle it separately");
             updateDsdaServiceWithCallState(call);
         } else {
@@ -1203,13 +1201,13 @@ public final class BluetoothPhoneServiceImpl {
             case CallState.NEW:
             case CallState.ABORTED:
             case CallState.DISCONNECTED:
-            case CallState.CONNECTING:
-            case CallState.SELECT_PHONE_ACCOUNT:
                 return CALL_STATE_IDLE;
 
             case CallState.ACTIVE:
                 return CALL_STATE_ACTIVE;
 
+            case CallState.CONNECTING:
+            case CallState.SELECT_PHONE_ACCOUNT:
             case CallState.DIALING:
                 // Yes, this is correctly returning ALERTING.
                 // "Dialing" for BT means that we have sent information to the service provider
