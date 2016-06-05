@@ -163,6 +163,7 @@ final class CallAudioManager extends CallsManagerListenerBase
                             } else if (phoneId == 1) {
                                 mAudioManager.setParameters("phone_type=cp2");
                             }
+                            mAudioManager.setParameters("realcall=on");
                         }
                         mAudioManager.setMode(newMode);
                         synchronized (mLock) {
